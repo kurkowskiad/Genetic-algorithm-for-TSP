@@ -3,14 +3,11 @@ import matplotlib.pyplot as plt
 import random
 import math
 
-names = ["Istanbul", "Moscow", "London", "Petersburg", "Berlin", "Madrid", "Kyiv", "Rome", "Paris", "Bucharest",
-         "Minsk", "Hamburg", "Vienna", "Warsaw", "Budapest", "Barcelona", "Kharkiv", "Munich", "Milan", "Prague"]
-
 class Node:
-    def __init__(self, x, y, name=""):
+    def __init__(self, x, y, label=None):
         self.x = x
         self.y = y
-        self.name = name
+        self.label = label
 
 
 class Edge:
@@ -22,7 +19,7 @@ class Edge:
 
 class Graph:
     def __init__(self, count, show_edges=False, show_edge_labels=False):
-        self.nodes = [Node(x=random.random(), y=random.random(), name=names[i]) for i in range(count)]
+        self.nodes = [Node(x=random.random(), y=random.random(), label=i) for i in range(count)]
         self.edges = self.create_edges()
         self.show_edges = show_edges
         self.show_edge_labels = show_edge_labels
@@ -45,13 +42,13 @@ class Graph:
     def initialize_all(self):
         # Add nodes.
         for node in self.nodes:
-            self.graph.add_node(node.name, pos=(node.x, node.y))
+            self.graph.add_node(node.label, pos=(node.x, node.y))
 
         pos = nx.get_node_attributes(self.graph, 'pos')
         if self.show_edges:
             # Add edges.
             for edge in self.edges:
-                self.graph.add_edge(edge.node1.name, edge.node2.name, weight=edge.weight)
+                self.graph.add_edge(edge.node1.label, edge.node2.label, weight=edge.weight)
             if self.show_edge_labels:
                 edge_labels = nx.get_edge_attributes(self.graph, 'weight')
                 # Draw edge labels.
@@ -65,6 +62,5 @@ class Graph:
         plt.show()
 
 if __name__ == "__main__":
-    # Node names must be unique, otherwise the node won't be added to the graph.
-    g = Graph(5)
+    g = Graph(5, True, True)
     g.initialize_all()
