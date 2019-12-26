@@ -44,14 +44,25 @@ class Population:
             solutions.append(Solution(nodes=new_list))
         return solutions
 
-    def draw_solution(self):
-        for edge in self.solutions[0].chromosome:
+    def draw_solution(self, index):
+        for edge in self.solutions[index].chromosome:
             self.graph.graph.add_edge(edge.node1.label, edge.node2.label, weight=edge.weight)
-            print(edge.node1.label, edge.node2.label)
+
+    def crossover(self):
+        parent1 = random.choice(self.solutions)
+        parent2 = random.choice(self.solutions)
+        while parent1 == parent2:
+            if len(self.solutions) == 1:
+                print("Needs bigger population than 1 for crossover reasons")
+                break
+            parent2 = random.choice(self.solutions)
+        offspring = [x.label for x in parent1.nodes]
+        print(offspring)
 
 if __name__ == "__main__":
-    g=Graph.Graph(graph=nx.Graph(), node_count=20)
-    pop=Population(size=10, graph=g)
+    g=Graph.Graph(graph=nx.Graph(), node_count=5)
+    pop=Population(size=3, graph=g)
     g.draw_graph(draw_edges=False)
-    pop.draw_solution()
+    #print([x.fitness for x in pop.solutions])
+    pop.crossover()
     g.run()
