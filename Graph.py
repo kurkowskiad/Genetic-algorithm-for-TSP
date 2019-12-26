@@ -37,13 +37,13 @@ class Graph:
                 index2 += 1
         return edges
 
-    def create_vis(self, edges=False):
+    def create_vis(self, draw_edges=False):
         # Add nodes.
         for node in self.nodes:
             self.graph.add_node(node.label, pos=(node.x, node.y))
         pos = nx.get_node_attributes(self.graph, 'pos')
 
-        if edges:
+        if draw_edges:
             # Add edges.
             for edge in self.edges:
                 self.graph.add_edge(edge.node1.label, edge.node2.label, weight=edge.weight)
