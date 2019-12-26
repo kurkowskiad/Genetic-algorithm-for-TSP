@@ -20,10 +20,6 @@ class Solution:
 
     def calculate_fitness(self):
         return sum([gene.weight for gene in self.chromosome])
-        # summ = 0
-        # for gene in self.chromosome:
-        #     summ += gene.weight
-        # return summ
 
 
 class Population:
@@ -37,12 +33,11 @@ class Population:
         new_list = []
         # This one just creates a sequence of n unique elements - solutions
         for _ in range(self.size):
-            node_labels = random.sample(range(1, self.size), self.size-1)
+            node_labels = random.sample(range(1, len(self.graph.nodes)), len(self.graph.nodes)-1)
             node_labels.insert(0,0)
             # These two are to sort things out, literally
-            for i in range(self.size):
+            for i in range(len(self.graph.nodes)):
                 for node in self.graph.nodes:
-                    print(i, len(node_labels), len(self.graph.nodes))
                     if node.label == node_labels[i]:
                         new_list.append(node)
                         break
