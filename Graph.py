@@ -11,10 +11,14 @@ class Node:
 
 
 class Edge:
-    def __init__(self, node1, node2, weight):
+    def __init__(self, node1, node2):
+        """
+        node1, node2 are objects of class Node
+        """
         self.node1 = node1
         self.node2 = node2
-        self.weight = round(weight,2)
+        self.weight = round(math.sqrt((self.node2.x-self.node1.x)**2
+                                      +(self.node2.y-self.node1.y)**2),2)
 
 
 class Graph:
@@ -31,13 +35,11 @@ class Graph:
                 if index1 == index2 or index2 < index1:
                     pass
                 else:
-                    edges.append(Edge(self.nodes[index1], self.nodes[index2],
-                                           weight=math.sqrt((self.nodes[index2].x-self.nodes[index1].x)**2
-                                                            +(self.nodes[index2].y-self.nodes[index1].y)**2)))
+                    edges.append(Edge(self.nodes[index1], self.nodes[index2]))
                 index2 += 1
         return edges
 
-    def create_vis(self, draw_edges=False):
+    def draw_graph(self, draw_edges=False):
         # Add nodes.
         for node in self.nodes:
             self.graph.add_node(node.label, pos=(node.x, node.y))
@@ -51,13 +53,16 @@ class Graph:
             # Draw edges with labels.
             nx.draw_networkx_edge_labels(self.graph, pos=pos, edge_labels=edge_labels)
 
-        # Draw nodes.
-        nx.draw(self.graph, pos=pos, with_labels=True)
+        # Draw graph.
+        nx.draw(self.graph, pos=pos, with_labels=True, edge_color='#000000')
 
+    @staticmethod
+    def run():
         plt.xlim(left=-0.02, right=1.02)
         plt.ylim(bottom=-0.02, top=1.02)
         plt.show()
 
 if __name__ == "__main__":
     g = Graph(nx.Graph(), 5)
-    g.create_vis(True)
+    g.draw_graph(draw_edges=True)
+    g.run()
