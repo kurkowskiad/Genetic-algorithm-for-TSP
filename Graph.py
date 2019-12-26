@@ -49,15 +49,14 @@ class Graph:
             # Add edges.
             for edge in self.edges:
                 self.graph.add_edge(edge.node1.label, edge.node2.label, weight=edge.weight)
+            # Draw edge labels.
             edge_labels = nx.get_edge_attributes(self.graph, 'weight')
-            # Draw edges with labels.
             nx.draw_networkx_edge_labels(self.graph, pos=pos, edge_labels=edge_labels)
 
+    def run(self):
         # Draw graph.
+        pos = nx.get_node_attributes(self.graph, 'pos')
         nx.draw(self.graph, pos=pos, with_labels=True, edge_color='#000000')
-
-    @staticmethod
-    def run():
         plt.xlim(left=-0.02, right=1.02)
         plt.ylim(bottom=-0.02, top=1.02)
         plt.show()

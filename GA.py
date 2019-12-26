@@ -27,30 +27,36 @@ class Solution:
 
 
 class Population:
-    def __init__(self, size, nodes):
+    def __init__(self, size, graph):
         self.size = size
-        self.nodes = nodes
+        self.graph = graph
         self.solutions = self.create_random()
 
     def create_random(self):
         solutions = []
         new_list = []
-        # This one just creates a sequence of n unique elements
+        # This one just creates a sequence of n unique elements - solutions
         for _ in range(self.size):
             node_labels = random.sample(range(1, self.size), self.size-1)
             node_labels.insert(0,0)
             # These two are to sort things out, literally
             for i in range(self.size):
-                for node in self.nodes:
+                for node in self.graph.nodes:
+                    print(i, len(node_labels), len(self.graph.nodes))
                     if node.label == node_labels[i]:
                         new_list.append(node)
                         break
             solutions.append(Solution(nodes=new_list))
         return solutions
 
+    def draw_solution(self):
+        for edge in self.solutions[0].chromosome:
+            self.graph.graph.add_edge(edge.node1.label, edge.node2.label, weight=edge.weight)
+            print(edge.node1.label, edge.node2.label)
 
 if __name__ == "__main__":
-    g=Graph.Graph(nx.Graph(), 5)
-    pop=Population(5, g.nodes)
+    g=Graph.Graph(graph=nx.Graph(), node_count=20)
+    pop=Population(size=10, graph=g)
     g.draw_graph(draw_edges=False)
+    pop.draw_solution()
     g.run()
