@@ -1,7 +1,7 @@
-import networkx as nx
-import matplotlib.pyplot as plt
 import random
 import math
+import matplotlib.pyplot as plt
+import networkx as nx
 
 class Node:
     def __init__(self, x, y, label=None):
@@ -18,12 +18,10 @@ class Edge:
 
 
 class Graph:
-    def __init__(self, count, show_edges=False, show_edge_labels=False):
-        self.nodes = [Node(x=random.random(), y=random.random(), label=i) for i in range(count)]
+    def __init__(self, graph, node_count):
+        self.nodes = [Node(x=random.random(), y=random.random(), label=i) for i in range(node_count)]
         self.edges = self.create_edges()
-        self.show_edges = show_edges
-        self.show_edge_labels = show_edge_labels
-        self.graph = nx.Graph()
+        self.graph = graph
 
     def create_edges(self):
         edges = []
@@ -39,20 +37,19 @@ class Graph:
                 index2 += 1
         return edges
 
-    def initialize_all(self):
+    def create_vis(self, edges=False):
         # Add nodes.
         for node in self.nodes:
             self.graph.add_node(node.label, pos=(node.x, node.y))
-
         pos = nx.get_node_attributes(self.graph, 'pos')
-        if self.show_edges:
+
+        if edges:
             # Add edges.
             for edge in self.edges:
                 self.graph.add_edge(edge.node1.label, edge.node2.label, weight=edge.weight)
-            if self.show_edge_labels:
-                edge_labels = nx.get_edge_attributes(self.graph, 'weight')
-                # Draw edge labels.
-                nx.draw_networkx_edge_labels(self.graph, pos=pos, edge_labels=edge_labels)
+            edge_labels = nx.get_edge_attributes(self.graph, 'weight')
+            # Draw edges with labels.
+            nx.draw_networkx_edge_labels(self.graph, pos=pos, edge_labels=edge_labels)
 
         # Draw nodes.
         nx.draw(self.graph, pos=pos, with_labels=True)
@@ -62,5 +59,5 @@ class Graph:
         plt.show()
 
 if __name__ == "__main__":
-    g = Graph(5, True, True)
-    g.initialize_all()
+    g = Graph(nx.Graph(), 5)
+    g.create_vis(True)
