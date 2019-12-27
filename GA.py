@@ -28,21 +28,24 @@ class Population:
         self.graph = graph
         self.solutions = self.create_random()
 
+    def convert_node_labels_to_nodes(self, labels):
+        nodes = []
+        for i in range(len(self.graph.nodes)):
+            for node in self.graph.nodes:
+                if node.label == labels[i]:
+                    nodes.append(node)
+                    break
+        return nodes
+
     def create_random(self):
         """Creates random solutions to TSP,
          as a list of Solution objects containing chromosome (list of edges) and nodes"""
         solutions = []
         # This one just creates a sequence of n unique elements - solutions
         for _ in range(self.size):
-            nodes = []
             node_labels = random.sample(range(1, len(self.graph.nodes)), len(self.graph.nodes)-1)
             node_labels.insert(0,0)
-            # These two are to sort things out, literally
-            for i in range(len(self.graph.nodes)):
-                for node in self.graph.nodes:
-                    if node.label == node_labels[i]:
-                        nodes.append(node)
-                        break
+            nodes = self.convert_node_labels_to_nodes(node_labels)
             solutions.append(Solution(nodes=nodes))
         return solutions
 
@@ -64,33 +67,30 @@ class Population:
 
         # Offspring initially a copy of parent1
         offspring = [node.label for node in parent1.nodes]
-        # print("Parent1: " + str([node.label for node in parent1.nodes]))
-        # print("Parent2: " + str([node.label for node in parent2.nodes]))
         index_list = []
+
         # Note indices of randomly chosen characters in offspring
         for index, label in enumerate(offspring):
             if random.random() >= 0.5:
                 index_list.append(index)
+
         # Values(node labels) on corresponding positions in index_list
         values = [offspring[index] for index in index_list]
-        # print("Index list: "+ str(index_list))
-        # print("Values: " + str(values))
-        # print()
-        # It's complicated ok?
+
+        # Changing indices of index_list in offspring to fit parent2 order
         for index in index_list:
             for label in [node.label for node in parent2.nodes]:
                 if label in values:
-                    # print(str(label) + " is in " + str(values))
-                    # print("Replacing " + str(offspring[index]) + " with " + str(label))
                     offspring[index] = label
                     values.remove(label)
                     break
 
-        print("Offspring: " + str(offspring))
+        nodes = self.convert_node_labels_to_nodes(offspring)
+        return Solution(nodes=nodes)
 
 if __name__ == "__main__":
     g=Graph.Graph(graph=nx.Graph(), node_count=7)
     pop=Population(size=3, graph=g)
     g.draw_graph(draw_edges=True)
     pop.crossover()
-    #g.run()
+    g.run()
