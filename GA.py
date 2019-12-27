@@ -29,19 +29,21 @@ class Population:
         self.solutions = self.create_random()
 
     def create_random(self):
+        """Creates random solutions to TSP,
+         as a list of Solution objects containing chromosome (list of edges) and nodes"""
         solutions = []
-        new_list = []
         # This one just creates a sequence of n unique elements - solutions
         for _ in range(self.size):
+            nodes = []
             node_labels = random.sample(range(1, len(self.graph.nodes)), len(self.graph.nodes)-1)
             node_labels.insert(0,0)
             # These two are to sort things out, literally
             for i in range(len(self.graph.nodes)):
                 for node in self.graph.nodes:
                     if node.label == node_labels[i]:
-                        new_list.append(node)
+                        nodes.append(node)
                         break
-            solutions.append(Solution(nodes=new_list))
+            solutions.append(Solution(nodes=nodes))
         return solutions
 
     def draw_solution(self, index):
@@ -49,20 +51,46 @@ class Population:
             self.graph.graph.add_edge(edge.node1.label, edge.node2.label, weight=edge.weight)
 
     def crossover(self):
+        """See Standard Decomposition on http://www.permutationcity.co.uk/projects/mutants/tsp.html"""
+        # Randomly choosing parents
         parent1 = random.choice(self.solutions)
         parent2 = random.choice(self.solutions)
         while parent1 == parent2:
             if len(self.solutions) == 1:
-                print("Needs bigger population than 1 for crossover reasons")
-                break
+                raise Exception("Needs bigger population than 1 for crossover reasons")
             parent2 = random.choice(self.solutions)
-        offspring = [x.label for x in parent1.nodes]
-        print(offspring)
+        if len(parent1.chromosome) != len(parent2.chromosome):
+            raise Exception("Parents are of different chromosome length. The code is buggy")
+
+        # Offspring initially a copy of parent1
+        offspring = [node.label for node in parent1.nodes]
+        # print("Parent1: " + str([node.label for node in parent1.nodes]))
+        # print("Parent2: " + str([node.label for node in parent2.nodes]))
+        index_list = []
+        # Note indices of randomly chosen characters in offspring
+        for index, label in enumerate(offspring):
+            if random.random() >= 0.5:
+                index_list.append(index)
+        # Values(node labels) on corresponding positions in index_list
+        values = [offspring[index] for index in index_list]
+        # print("Index list: "+ str(index_list))
+        # print("Values: " + str(values))
+        # print()
+        # It's complicated ok?
+        for index in index_list:
+            for label in [node.label for node in parent2.nodes]:
+                if label in values:
+                    # print(str(label) + " is in " + str(values))
+                    # print("Replacing " + str(offspring[index]) + " with " + str(label))
+                    offspring[index] = label
+                    values.remove(label)
+                    break
+
+        print("Offspring: " + str(offspring))
 
 if __name__ == "__main__":
-    g=Graph.Graph(graph=nx.Graph(), node_count=5)
+    g=Graph.Graph(graph=nx.Graph(), node_count=7)
     pop=Population(size=3, graph=g)
-    g.draw_graph(draw_edges=False)
-    #print([x.fitness for x in pop.solutions])
+    g.draw_graph(draw_edges=True)
     pop.crossover()
-    g.run()
+    #g.run()
