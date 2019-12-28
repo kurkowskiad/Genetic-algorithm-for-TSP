@@ -136,10 +136,11 @@ class GA:
     def run(self):
         best_fitness = []
         average_fitness = []
+        start = time.time()
         for i in range(1000):
             self.graph.add_nodes_edges()
-            best_fitness.append(pop.solutions[0].fitness)
-            average_fitness.append(sum([sol.fitness for sol in pop.solutions])/pop.size)
+            best_fitness.append(round(pop.solutions[0].fitness,3))
+            average_fitness.append(round(sum([sol.fitness for sol in pop.solutions])/pop.size,3))
             if i%5==0:
                 print("GENERATION " + str(i) + ", best fitness: " + str(best_fitness[i]), end=", ")
                 print("average fitness: " + str(average_fitness[i]))
@@ -150,6 +151,7 @@ class GA:
             # If difference between average fitness of 100 iterations and current fitness smaller than .01
             if len(best_fitness) > 100 and sum(best_fitness[-100:])/100 - best_fitness[i] < .01:
                 print("FINISHED IN GENERATION " + str(i))
+                print("time taken: " + str(round((time.time() - start),3)))
                 plt.pause(20)
             plt.pause(.001)
             pop.remove_all_edges()
@@ -157,6 +159,6 @@ class GA:
 
 if __name__ == "__main__":
     g=Graph.Graph(graph=nx.Graph(), node_count=30)
-    pop=Population(size=50, graph=g)
+    pop=Population(size=20, graph=g)
     algorithm = GA(graph=g, population=pop)
     algorithm.run()
