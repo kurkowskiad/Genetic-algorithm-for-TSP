@@ -1,7 +1,7 @@
 import random
 import math
-import matplotlib.pyplot as plt
 import networkx as nx
+import matplotlib.pyplot as plt
 
 class Node:
     def __init__(self, x, y, label=None):
@@ -39,7 +39,7 @@ class Graph:
                 index2 += 1
         return edges
 
-    def draw_graph(self, draw_edges=False):
+    def add_nodes_edges(self, draw_edges=False):
         # Add nodes.
         for node in self.nodes:
             self.graph.add_node(node.label, pos=(node.x, node.y))
@@ -53,15 +53,15 @@ class Graph:
             edge_labels = nx.get_edge_attributes(self.graph, 'weight')
             nx.draw_networkx_edge_labels(self.graph, pos=pos, edge_labels=edge_labels)
 
-    def run(self):
-        # Draw graph.
+    def update_graph(self):
         pos = nx.get_node_attributes(self.graph, 'pos')
         nx.draw(self.graph, pos=pos, with_labels=True, edge_color='#000000')
         plt.xlim(left=-0.02, right=1.02)
         plt.ylim(bottom=-0.02, top=1.02)
-        plt.show()
+        plt.draw()
 
 if __name__ == "__main__":
-    g = Graph(nx.Graph(), 5)
-    g.draw_graph(draw_edges=True)
-    g.run()
+    g = Graph(nx.Graph(), 10)
+    g.add_nodes_edges(draw_edges=True)
+    g.update_graph()
+    plt.show()
