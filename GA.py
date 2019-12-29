@@ -151,6 +151,7 @@ class GA:
                 if len(best_fitness) > 100 and sum(best_fitness[-100:]) / 100 - best_fitness[i] < .01:
                     print("FINISHED IN GENERATION " + str(i))
                     print("time taken: " + str(round((time.time() - start), 3)))
+                    print("Best solution's chromosome: " + str([node.label for node in pop.solutions[0].nodes]))
                     pop.remove_all_edges()
                     plt.clf()
                     self.graph.add_nodes_edges()
@@ -171,7 +172,7 @@ class GA:
             plt.pause(.001)
 
 if __name__ == "__main__":
-    g=Graph.Graph(graph=nx.Graph(), node_count=50)
-    pop=Population(size=200, graph=g, mutation_chance=.03)
-    algorithm = GA(graph=g, population=pop, drawing=True, drawing_frequency=10)
+    g=Graph.Graph(graph=nx.Graph(), node_count=30)
+    pop=Population(size=150, graph=g, mutation_chance=.03)
+    algorithm = GA(graph=g, population=pop, drawing=True, drawing_frequency=5)
     algorithm.run()
