@@ -25,10 +25,11 @@ class Solution:
 
 
 class Population:
-    def __init__(self, size, graph):
+    def __init__(self, size, graph, mutation_chance = .03):
         self.size = size
         self.graph = graph
         self.solutions = self.create_random()
+        self.mutation_chance = mutation_chance
 
     def match_node_labels_to_nodes(self, labels):
         nodes = []
@@ -88,14 +89,14 @@ class Population:
         nodes = self.match_node_labels_to_nodes(offspring)
         return Solution(nodes=nodes)
 
-    def mutate(self, parent, mutation_chance, swap_with_neighbour=True):
+    def mutate(self, parent, swap_with_neighbour=False):
         offspring = [node.label for node in parent.nodes]
 
         if swap_with_neighbour:
             for index, _ in enumerate(offspring):
                 if index == 0:
                     pass
-                elif random.random() <= mutation_chance:
+                elif random.random() <= self.mutation_chance:
                     try:
                         offspring[index], offspring[index + 1] = offspring[index + 1], offspring[index]
                     except IndexError:
@@ -104,7 +105,7 @@ class Population:
             for index, _ in enumerate(offspring):
                 if index == 0:
                     pass
-                elif random.random() <= mutation_chance:
+                elif random.random() <= self.mutation_chance:
                     random_index = random.randint(1, len(offspring) - 1)
                     offspring[index], offspring[random_index] = offspring[random_index], offspring[index]
 
@@ -125,40 +126,52 @@ class Population:
                 if len(self.solutions) == 1:
                     raise Exception("Population is too small. Make starting population bigger.")
                 parent2=random.choice(self.solutions)
-            self.solutions.append(self.mutate(self.crossover(parent1, parent2), .05))
+            self.solutions.append(self.mutate(self.crossover(parent1, parent2)))
 
 
 class GA:
-    def __init__(self, graph, population):
+    def __init__(self, graph, population, drawing=True, drawing_frequency=1):
         self.graph = graph
         self.population = population
+        self.drawing = drawing
+        self.drawing_frequency = drawing_frequency
 
     def run(self):
         best_fitness = []
         average_fitness = []
         start = time.time()
-        for i in range(1000):
+        for i in range(10000):
             self.graph.add_nodes_edges()
             best_fitness.append(round(pop.solutions[0].fitness,3))
             average_fitness.append(round(sum([sol.fitness for sol in pop.solutions])/pop.size,3))
             if i%5==0:
                 print("GENERATION " + str(i) + ", best fitness: " + str(best_fitness[i]), end=", ")
                 print("average fitness: " + str(average_fitness[i]))
+                # If difference between average fitness of 100 iterations and current fitness smaller than .01, then stop
+                if len(best_fitness) > 100 and sum(best_fitness[-100:]) / 100 - best_fitness[i] < .01:
+                    print("FINISHED IN GENERATION " + str(i))
+                    print("time taken: " + str(round((time.time() - start), 3)))
+                    pop.remove_all_edges()
+                    plt.clf()
+                    self.graph.add_nodes_edges()
+                    self.graph.update_graph()
+                    plt.savefig("problem.png")
+                    pop.draw_solution(0)
+                    self.graph.update_graph()
+                    plt.savefig("solution.png")
+                    return
             self.population.kill_population(.5)
             pop.repopulate()
-            pop.draw_solution(0)
-            self.graph.update_graph()
-            # If difference between average fitness of 100 iterations and current fitness smaller than .01
-            if len(best_fitness) > 100 and sum(best_fitness[-100:])/100 - best_fitness[i] < .01:
-                print("FINISHED IN GENERATION " + str(i))
-                print("time taken: " + str(round((time.time() - start),3)))
-                plt.pause(20)
+            if self.drawing:
+                if i%self.drawing_frequency == 0:
+                    pop.remove_all_edges()
+                    plt.clf()
+                    pop.draw_solution(0)
+                    self.graph.update_graph()
             plt.pause(.001)
-            pop.remove_all_edges()
-            plt.clf()
 
 if __name__ == "__main__":
-    g=Graph.Graph(graph=nx.Graph(), node_count=30)
-    pop=Population(size=20, graph=g)
-    algorithm = GA(graph=g, population=pop)
+    g=Graph.Graph(graph=nx.Graph(), node_count=50)
+    pop=Population(size=200, graph=g, mutation_chance=.03)
+    algorithm = GA(graph=g, population=pop, drawing=True, drawing_frequency=10)
     algorithm.run()
