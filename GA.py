@@ -1,8 +1,9 @@
 import networkx as nx
-import Graph
 import random
 import matplotlib.pyplot as plt
 import time
+import Graph
+import Stats
 
 class Solution:
     def __init__(self, nodes):
@@ -160,7 +161,7 @@ class GA:
                     pop.draw_solution(0)
                     self.graph.update_graph()
                     plt.savefig("solution.png")
-                    return
+                    return best_fitness, average_fitness, range(i+1)
             self.population.kill_population(.5)
             pop.repopulate()
             if self.drawing:
@@ -175,4 +176,5 @@ if __name__ == "__main__":
     g=Graph.Graph(graph=nx.Graph(), node_count=30)
     pop=Population(size=150, graph=g, mutation_chance=.03)
     algorithm = GA(graph=g, population=pop, drawing=True, drawing_frequency=5)
-    algorithm.run()
+    stats = Stats.Stats(*algorithm.run())
+    stats.plot_stats()
